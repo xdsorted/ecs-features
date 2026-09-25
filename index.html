@@ -47,11 +47,11 @@
     height: 100%;
     user-select: none;
     -webkit-user-drag: none;
-    transition: filter 0.2s ease;
+    transition: filter 0.2s ease, opacity 0.2s ease;
   }
 
-  /* Blur + slightly dim the card on hover */
-  .overlay:hover img { filter: blur(7px) brightness(0.85); }
+  /* Blur the card on hover, letting the light page show through (frosted look) */
+  .overlay:hover img { filter: blur(7px); opacity: 0.55; }
 
   /* Download button, centered, appears on overlay hover */
   .overlay .dl {
