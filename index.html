@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ECS Features — Showroom</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #f2f2f2;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  }
+
+  /* ---- Page canvas: fixed 1680, centered ---- */
+  .stage {
+    width: 1680px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .page {
+    position: relative;
+    width: 1680px;
+    display: none;
+  }
+
+  .page.active { display: block; }
+
+  .page > .bg {
+    display: block;
+    width: 1680px;
+    height: auto;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .page .overlay {
+    position: absolute;
+    display: block;
+  }
+
+  /* ---- Bottom page switcher (drop-up) ---- */
+  .switcher {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    font: 500 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  }
+
+  .switcher .trigger {
+    display: flex;
+    align-items: center;
+    gap: 34px;
+    min-width: 260px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(17, 19, 26, 0.88);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    color: #fff;
+    padding: 14px 18px 14px 20px;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .switcher .trigger:hover { border-color: rgba(255,255,255,0.18); }
+
+  .switcher .trigger .label {
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .switcher .trigger .hint {
+    color: rgba(255,255,255,0.35);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .switcher .trigger .chevron {
+    width: 10px;
+    height: 10px;
+    flex: none;
+    transition: transform 0.25s cubic-bezier(0.3, 0.9, 0.3, 1);
+  }
+
+  .switcher.open .trigger .chevron { transform: rotate(180deg); }
+
+  .switcher .menu {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 0;
+    right: 0;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(17, 19, 26, 0.92);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border-radius: 14px;
+    padding: 6px;
+    box-shadow: 0 18px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06);
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+    transform-origin: bottom center;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.3, 0.9, 0.3, 1);
+  }
+
+  .switcher.open .menu {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .switcher .menu button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: rgba(255,255,255,0.72);
+    font: inherit;
+    text-align: left;
+    padding: 11px 12px;
+    border-radius: 9px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.12s, color 0.12s;
+  }
+
+  .switcher .menu button:hover {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+  }
+
+  .switcher .menu button .dot {
+    width: 6px;
+    height: 6px;
+    flex: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    transition: background 0.12s, box-shadow 0.12s;
+  }
+
+  .switcher .menu button.active {
+    color: #fff;
+    background: rgba(255,255,255,0.06);
+  }
+
+  .switcher .menu button.active .dot {
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.7);
+  }
+
+  /* ---- Preloader ---- */
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    background: #101218;
+    color: #fff;
+    transition: opacity 0.45s ease;
+  }
+
+  .loader.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .loader .title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .loader .percent {
+    font-size: 44px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .loader .bar {
+    width: 260px;
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+    overflow: hidden;
+  }
+
+  .loader .bar .fill {
+    display: block;
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: #4ade80;
+    box-shadow: 0 0 12px rgba(74, 222, 128, 0.6);
+    transition: width 0.25s ease;
+  }
+
+  /* ---- Small screen warning ---- */
+  .size-warning {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: #f5e6b8;
+    color: #5c4a12;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: center;
+    padding: 12px 20px;
+  }
+
+  .size-warning strong { font-weight: 600; }
+
+  /* ---- Zoom toggle (like the page switcher, bottom-right) ---- */
+  .zoom-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(17, 19, 26, 0.88);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    color: #fff;
+    font: 500 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    padding: 14px 18px;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+    transition: border-color 0.15s;
+  }
+
+  .zoom-toggle:hover { border-color: rgba(255,255,255,0.18); }
+
+  .zoom-toggle .hint {
+    color: rgba(255,255,255,0.35);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Only shown when the viewport is narrower than the fixed 1480px view */
+  body.narrow .zoom-toggle { display: flex; }
+
+  /* Narrower than the 1680px canvas: crop evenly (margin is set from JS) */
+  @media (max-width: 1679px) {
+    body { overflow-x: hidden; }
+  }
+
+  @media (max-width: 1439px) {
+    body.zoom-100 .size-warning { display: block; }
+  }
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader">
+  <div class="title">ECS Features</div>
+  <div class="percent" id="loaderPercent">0%</div>
+  <div class="bar"><span class="fill" id="loaderFill"></span></div>
+</div>
+
+<div class="size-warning">
+  For the best experience, view this page on a screen at least <strong>1440&nbsp;px</strong> wide.
+</div>
+
+<div class="stage" id="stage"></div>
+
+<nav class="switcher" id="switcher">
+  <button class="trigger" id="trigger" aria-haspopup="listbox" aria-expanded="false">
+    <span class="label" id="triggerLabel"></span>
+    <span class="hint">Pages</span>
+    <svg class="chevron" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+      <path d="M1.5 6.5 L5 3 L8.5 6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <div class="menu" id="menu" role="listbox"></div>
+</nav>
+
+<button class="zoom-toggle" id="zoomToggle" aria-pressed="true">
+  <span class="label" id="zoomLabel">Fit width</span>
+  <span class="hint">Zoom</span>
+</button>
+
+<script>
+  // ============================================================
+  // Config: one entry per page.
+  // bg      — background image (2x export, shown at 1680px wide)
+  // items   — animated SVG overlays with 1x coordinates from Figma
+  // ============================================================
+  const PAGES = [
+    {
+      name: "AI Search",
+      bg: "ai-search.png",
+      items: [
+        { src: "images/ai-search/ask-questions-in-natural-language-and-find-answers-animated.svg",
+          x: 240, y: 2444, w: 570, h: 570 },
+        { src: "images/ai-search/narrow-results-by-folder-date-range-or-a-custom-interval-animated.svg",
+          x: 870, y: 3208, w: 570, h: 570 },
+        { src: "images/ai-search/ai-processing-stays-inside-an-isolated-virtual-private-cloud-never-the-public-internet-animated.svg",
+          x: 240, y: 3977, w: 570, h: 570 },
+      ],
+    },
+    {
+      name: "Access Control",
+      bg: "access-control.png",
+      items: [
+        { src: "images/access-control/set-system-roles-and-user-roles-for-clear-document-access-animated.svg",
+          x: 240, y: 2422, w: 570, h: 570 },
+        { src: "images/access-control/set-access-by-area-or-drill-into-a-single-subfolder-animated.svg",
+          x: 870, y: 3186, w: 570, h: 570 },
+        { src: "images/access-control/restrict-access-to-specific-folders-animated.svg",
+          x: 240, y: 3950, w: 570, h: 570 },
+      ],
+    },
+    {
+      name: "Meetings & Agenda",
+      bg: "meeting-and-agenda-management.png",
+      items: [
+        { src: "images/meeting-and-agenda-management/last-meetings-agenda-is-the-fastest-first-draft-of-this-one-animated.svg",
+          x: 240, y: 2452, w: 570, h: 570 },
+        { src: "images/meeting-and-agenda-management/ai-assisted-drafting-for-the-wording-that-matters.svg",
+          x: 840, y: 3285, w: 540, h: 540 },
+        { src: "images/meeting-and-agenda-management/an-agenda-item-that-explains-itself-before-anyone-speaks-animated.svg",
+          x: 240, y: 4089, w: 570, h: 570 },
+        { src: "images/meeting-and-agenda-management/attach-the-papers-to-the-item-not-to-the-email-animated.svg",
+          x: 870, y: 4896, w: 570, h: 564 },
+      ],
+    },
+    {
+      name: "Dashboard",
+      bg: "dashboard.png",
+      items: [
+        { src: "images/dashboard/the-secretariat-decides-what-the-board-reads-first.svg",
+          x: 240, y: 2465, w: 570, h: 570 },
+        { src: "images/dashboard/every-meeting-you-have-been-invited-to-in-one-list.svg",
+          x: 870, y: 3269, w: 570, h: 570 },
+        { src: "images/dashboard/one-sign-in-across-every-organisation-you-serve.svg",
+          x: 240, y: 4073, w: 570, h: 570 },
+      ],
+    },
+    {
+      name: "E-signatures",
+      bg: "e-signatures.png",
+      items: [
+        { src: "images/e-signatures/choose-signature-levels-limited-or-advanced.svg",
+          x: 240, y: 2447, w: 570, h: 564 },
+        { src: "images/e-signatures/due-dates-and-reminders-that-keep-requests-moving.svg",
+          x: 870, y: 3248, w: 570, h: 570 },
+        { src: "images/e-signatures/one-screen-for-every-pending-and-completed-request.svg",
+          x: 240, y: 4055, w: 570, h: 564 },
+      ],
+    },
+    {
+      name: "AI Agenda & Minutes",
+      bg: "ai-agenda-and-minutes-drafting.png",
+      items: [
+        { src: "images/ai-agenda-and-minutes-drafting/sharpen-tone-and-clarity-without-rewriting-from-scratch.svg",
+          x: 240, y: 2422, w: 570, h: 570 },
+        { src: "images/ai-agenda-and-minutes-drafting/insert-ai-text-directly-or-ask-for-another-version.svg",
+          x: 870, y: 3186, w: 570, h: 570 },
+        { src: "images/ai-agenda-and-minutes-drafting/turn-a-long-discussion-into-a-clear-summary.svg",
+          x: 240, y: 3950, w: 570, h: 570 },
+      ],
+    },
+    {
+      name: "AI Executive Summaries",
+      bg: "ai-agenda-and-minutes-drafting-1.png",
+      items: [
+        { src: "images/ai-executive-summaries/key-information-organised-into-sections-not-a-wall-of-text.svg",
+          x: 240, y: 2466, w: 570, h: 570 },
+        { src: "images/ai-executive-summaries/insert-ai-text-directly-or-ask-for-another-version.svg",
+          x: 870, y: 3230, w: 570, h: 570 },
+        { src: "images/ai-executive-summaries/a-clear-audit-trail-for-every-summary-created-or-viewed.svg",
+          x: 240, y: 3994, w: 570, h: 570 },
+      ],
+    },
+    {
+      name: "Board Pack",
+      bg: "board-pack.png",
+      items: [
+        { src: "images/board-pack/build-the-pack-once-then-start-the-next-one-from-it.svg",
+          x: 240, y: 2472, w: 570, h: 570 },
+        { src: "images/board-pack/ai-powered-summaries-for-board-documents.svg",
+          x: 840, y: 3311, w: 540, h: 540 },
+        { src: "images/board-pack/directors-read-annotate-and-prepare-without-leaving-the-pack.svg",
+          x: 240, y: 4109, w: 570, h: 570 },
+        { src: "images/board-pack/who-saw-which-papers-recorded-as-you-go.svg",
+          x: 870, y: 4913, w: 570, h: 570 },
+      ],
+    },
+    {
+      name: "Document Management",
+      bg: "document-management.png",
+      items: [
+        { src: "images/document-management/start-every-portal-from-a-proven-best-practice-template.svg",
+          x: 240, y: 2475, w: 570, h: 564 },
+        { src: "images/document-management/ai-powered-search-for-board-documents.svg",
+          x: 840, y: 3305, w: 540, h: 540 },
+        { src: "images/document-management/import-documents-in-batch.svg",
+          x: 240, y: 4109, w: 570, h: 570 },
+        { src: "images/document-management/decide-who-can-print-download-or-just-read-each-file.svg",
+          x: 870, y: 4913, w: 570, h: 570 },
+      ],
+    },
+  ];
+
+  const stage = document.getElementById("stage");
+  const switcher = document.getElementById("switcher");
+  const trigger = document.getElementById("trigger");
+  const triggerLabel = document.getElementById("triggerLabel");
+  const menu = document.getElementById("menu");
+  const loader = document.getElementById("loader");
+  const loaderPercent = document.getElementById("loaderPercent");
+  const loaderFill = document.getElementById("loaderFill");
+
+  // ---- Preloader: load everything upfront ----
+  const totalAssets = PAGES.reduce((n, p) => n + 1 + p.items.length, 0);
+  let loadedAssets = 0;
+
+  function assetDone() {
+    loadedAssets++;
+    const pct = Math.round(loadedAssets / totalAssets * 100);
+    loaderPercent.textContent = pct + "%";
+    loaderFill.style.width = pct + "%";
+    if (loadedAssets >= totalAssets) {
+      setTimeout(() => loader.classList.add("hidden"), 350);
+    }
+  }
+
+  function trackImg(img, src) {
+    img.addEventListener("load", assetDone);
+    img.addEventListener("error", assetDone); // don't hang forever on a broken file
+    img.src = encodeURI(src);
+  }
+
+  PAGES.forEach((page, i) => {
+    // page container
+    const el = document.createElement("div");
+    el.className = "page" + (i === 0 ? " active" : "");
+    el.dataset.index = i;
+
+    const bg = document.createElement("img");
+    bg.className = "bg";
+    bg.alt = page.name;
+    trackImg(bg, page.bg);
+    el.appendChild(bg);
+
+    page.items.forEach(item => {
+      const img = document.createElement("img");
+      img.className = "overlay";
+      img.alt = "";
+      img.style.left = item.x + "px";
+      img.style.top = item.y + "px";
+      img.style.width = item.w + "px";
+      img.style.height = item.h + "px";
+      trackImg(img, item.src);
+      el.appendChild(img);
+    });
+
+    stage.appendChild(el);
+
+    // dropdown item
+    const btn = document.createElement("button");
+    btn.setAttribute("role", "option");
+    btn.className = i === 0 ? "active" : "";
+    btn.innerHTML = '<span class="dot"></span>';
+    btn.appendChild(document.createTextNode(page.name));
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      menu.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+      el.classList.add("active");
+      btn.classList.add("active");
+      triggerLabel.textContent = page.name;
+      closeMenu();
+      window.scrollTo(0, 0);
+    });
+    menu.appendChild(btn);
+  });
+
+  triggerLabel.textContent = PAGES[0].name;
+
+  function openMenu() {
+    switcher.classList.add("open");
+    trigger.setAttribute("aria-expanded", "true");
+  }
+  function closeMenu() {
+    switcher.classList.remove("open");
+    trigger.setAttribute("aria-expanded", "false");
+  }
+
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    switcher.classList.contains("open") ? closeMenu() : openMenu();
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!switcher.contains(e.target)) closeMenu();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeMenu();
+  });
+
+  // ---- Zoom ----
+  // 1680..1480px: canvas is cropped evenly on both sides (design margins).
+  // Below 1480px: the central 1480px view is fixed and scaled to the window.
+  const zoomToggle = document.getElementById("zoomToggle");
+  const zoomLabel = document.getElementById("zoomLabel");
+  const CANVAS_W = 1680; // full canvas width
+  const FIT_W = 1480;    // fixed view width that must stay fully visible
+  let fitMode = true;
+
+  function applyZoom() {
+    const w = window.innerWidth;
+    const narrow = w < FIT_W;
+    document.body.classList.toggle("narrow", narrow);
+    document.body.classList.toggle("zoom-100", !fitMode);
+
+    const s = (fitMode && narrow) ? w / FIT_W : 1;
+    stage.style.zoom = s;
+    // Center the canvas, cropping both sides evenly (value is in zoomed px)
+    stage.style.marginLeft = w < CANVAS_W ? ((w - CANVAS_W * s) / 2 / s) + "px" : "";
+
+    zoomLabel.textContent = (fitMode && narrow)
+      ? "Fit \u00b7 " + Math.round(s * 100) + "%"
+      : "100%";
+    zoomToggle.setAttribute("aria-pressed", String(fitMode));
+  }
+
+  zoomToggle.addEventListener("click", () => {
+    fitMode = !fitMode;
+    applyZoom();
+  });
+
+  window.addEventListener("resize", applyZoom);
+  applyZoom();
+</script>
+
+</body>
+</html>
