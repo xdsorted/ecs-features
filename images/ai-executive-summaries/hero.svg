@@ -112,7 +112,7 @@
 <rect x="640" y="160" width="80" height="80" rx="1.93809" fill="white" fill-opacity="0.1"/>
 <rect x="640.485" y="160.485" width="79.031" height="79.031" rx="1.45357" stroke="url(#paint27_linear_700_6262)" stroke-opacity="0.4" stroke-width="0.969044"/>
 </g>
-<foreignObject x="572" y="12.0002" width="376" height="376"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(74px);clip-path:url(#bgblur_29_700_6262_clip_path);height:100%;width:100%"></div></foreignObject><g filter="url(#filter28_i_700_6262)" data-figma-bg-blur-radius="148">
+<foreignObject x="572" y="12.0002" width="376" height="376"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(74px);clip-path:url(#bgblur_29_700_6262_clip_path);height:100%;width:100%"></div></foreignObject><g opacity="0.1" filter="url(#filter28_i_700_6262)" data-figma-bg-blur-radius="148">
 <rect x="720" y="160" width="80" height="80" rx="1.93809" fill="white" fill-opacity="0.1"/>
 <rect x="720.485" y="160.485" width="79.031" height="79.031" rx="1.45357" stroke="url(#paint28_linear_700_6262)" stroke-opacity="0.4" stroke-width="0.969044"/>
 </g>
@@ -140,7 +140,7 @@
 <rect x="480" y="240" width="80" height="80" rx="1.93809" fill="white" fill-opacity="0.1"/>
 <rect x="480.485" y="240.484" width="79.031" height="79.031" rx="1.45357" stroke="url(#paint34_linear_700_6262)" stroke-opacity="0.4" stroke-width="0.969044"/>
 </g>
-<foreignObject x="572" y="91.9999" width="376" height="376"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(74px);clip-path:url(#bgblur_36_700_6262_clip_path);height:100%;width:100%"></div></foreignObject><g opacity="0.7" filter="url(#filter35_i_700_6262)" data-figma-bg-blur-radius="148">
+<foreignObject x="572" y="91.9999" width="376" height="376"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(74px);clip-path:url(#bgblur_36_700_6262_clip_path);height:100%;width:100%"></div></foreignObject><g opacity="0.2" filter="url(#filter35_i_700_6262)" data-figma-bg-blur-radius="148">
 <rect x="720" y="240" width="80" height="80" rx="1.93809" fill="white" fill-opacity="0.1"/>
 <rect x="720.485" y="240.484" width="79.031" height="79.031" rx="1.45357" stroke="url(#paint35_linear_700_6262)" stroke-opacity="0.4" stroke-width="0.969044"/>
 </g>
@@ -188,7 +188,7 @@
 <rect x="560.188" y="400" width="80" height="80" rx="1.93809" fill="white" fill-opacity="0.1"/>
 <rect x="560.672" y="400.485" width="79.031" height="79.031" rx="1.45357" stroke="url(#paint46_linear_700_6262)" stroke-opacity="0.4" stroke-width="0.969044"/>
 </g>
-<foreignObject x="572" y="252" width="376" height="376"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(74px);clip-path:url(#bgblur_48_700_6262_clip_path);height:100%;width:100%"></div></foreignObject><g filter="url(#filter47_i_700_6262)" data-figma-bg-blur-radius="148">
+<foreignObject x="572" y="252" width="376" height="376"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(74px);clip-path:url(#bgblur_48_700_6262_clip_path);height:100%;width:100%"></div></foreignObject><g opacity="0.5" filter="url(#filter47_i_700_6262)" data-figma-bg-blur-radius="148">
 <rect x="720" y="400" width="80" height="80" rx="1.93809" fill="white" fill-opacity="0.1"/>
 <rect x="720.485" y="400.485" width="79.031" height="79.031" rx="1.45357" stroke="url(#paint47_linear_700_6262)" stroke-opacity="0.4" stroke-width="0.969044"/>
 </g>
@@ -256,11 +256,11 @@
 <rect x="640.188" y="560" width="80" height="80" rx="1.93809" fill="white" fill-opacity="0.1"/>
 <rect x="640.672" y="560.485" width="79.031" height="79.031" rx="1.45357" stroke="url(#paint63_linear_700_6262)" stroke-opacity="0.4" stroke-width="0.969044"/>
 </g>
-<foreignObject x="492.188" y="492" width="376" height="376"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(74px);clip-path:url(#bgblur_65_700_6262_clip_path);height:100%;width:100%"></div></foreignObject><g filter="url(#filter64_i_700_6262)" data-figma-bg-blur-radius="148">
+<foreignObject x="492.188" y="492" width="376" height="376"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(74px);clip-path:url(#bgblur_65_700_6262_clip_path);height:100%;width:100%"></div></foreignObject><g opacity="0.2" filter="url(#filter64_i_700_6262)" data-figma-bg-blur-radius="148">
 <rect x="640.188" y="640" width="80" height="80" rx="1.93809" fill="white" fill-opacity="0.1"/>
 <rect x="640.672" y="640.484" width="79.031" height="79.031" rx="1.45357" stroke="url(#paint64_linear_700_6262)" stroke-opacity="0.4" stroke-width="0.969044"/>
 </g>
-<foreignObject x="572.188" y="492" width="376" height="376"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(74px);clip-path:url(#bgblur_66_700_6262_clip_path);height:100%;width:100%"></div></foreignObject><g filter="url(#filter65_i_700_6262)" data-figma-bg-blur-radius="148">
+<foreignObject x="572.188" y="492" width="376" height="376"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(74px);clip-path:url(#bgblur_66_700_6262_clip_path);height:100%;width:100%"></div></foreignObject><g opacity="0.1" filter="url(#filter65_i_700_6262)" data-figma-bg-blur-radius="148">
 <rect x="720.188" y="640" width="80" height="80" rx="1.93809" fill="white" fill-opacity="0.1"/>
 <rect x="720.672" y="640.484" width="79.031" height="79.031" rx="1.45357" stroke="url(#paint65_linear_700_6262)" stroke-opacity="0.4" stroke-width="0.969044"/>
 </g>
@@ -268,7 +268,7 @@
 <rect x="720.375" y="560" width="80" height="80" rx="1.93809" fill="white" fill-opacity="0.1"/>
 <rect x="720.86" y="560.485" width="79.031" height="79.031" rx="1.45357" stroke="url(#paint66_linear_700_6262)" stroke-opacity="0.4" stroke-width="0.969044"/>
 </g>
-<foreignObject x="572.375" y="332" width="376" height="376"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(74px);clip-path:url(#bgblur_68_700_6262_clip_path);height:100%;width:100%"></div></foreignObject><g filter="url(#filter67_i_700_6262)" data-figma-bg-blur-radius="148">
+<foreignObject x="572.375" y="332" width="376" height="376"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(74px);clip-path:url(#bgblur_68_700_6262_clip_path);height:100%;width:100%"></div></foreignObject><g opacity="0.3" filter="url(#filter67_i_700_6262)" data-figma-bg-blur-radius="148">
 <rect x="720.375" y="480" width="80" height="80" rx="1.93809" fill="white" fill-opacity="0.1"/>
 <rect x="720.86" y="480.484" width="79.031" height="79.031" rx="1.45357" stroke="url(#paint67_linear_700_6262)" stroke-opacity="0.4" stroke-width="0.969044"/>
 </g>
