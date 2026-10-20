@@ -41,6 +41,19 @@
     position: absolute;
   }
 
+  /* Hero background drawn in code. Two modes:
+     - hero.text set: opaque gradient, transparent text PNG on top
+     - no text: the bg PNG holds the hero text on white, the gradient multiplies over it */
+  .page .hero-bg,
+  .page .hero-text {
+    position: absolute;
+    left: 0;
+    width: 1680px;
+    pointer-events: none;
+  }
+  .page .hero-bg.multiply { mix-blend-mode: multiply; }
+  .page .hero-text { display: block; user-select: none; -webkit-user-drag: none; }
+
   .page .overlay img {
     display: block;
     width: 100%;
@@ -208,6 +221,22 @@
     box-shadow: 0 0 8px rgba(74, 222, 128, 0.7);
   }
 
+  /* "New" label on recently added pages (menu items + trigger) */
+  .switcher .new {
+    margin-left: auto;
+    padding: 4px 7px;
+    border-radius: 6px;
+    background: rgba(74, 222, 128, 0.16);
+    color: #4ade80;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .switcher .trigger .label .new { margin-left: 10px; vertical-align: 1px; }
+
   /* ---- Preloader ---- */
   .loader {
     position: fixed;
@@ -357,14 +386,114 @@
 <script>
   // ============================================================
   // Config: one entry per page.
+  // product — product name; with the page name it prefixes every download (client-ready file names)
   // bg      — background image (2x export, shown at 1680px wide)
   // items   — animated SVG overlays with 1x coordinates from Figma
+  // hero    — optional CSS gradient for the hero band; with { text } a transparent 2x text PNG goes on top
   // ============================================================
+  // Hero band gradients: drawn in code under the white hero area of the bg PNG
+  const HERO = { y: 127, h: 720, background: "linear-gradient(90deg, #E5FFFB 40%, #5CD6C6 100%)" };
+  const AI_HERO = { y: 127, h: 720, background: "linear-gradient(90deg, #D8FFF9 30%, #5CD6C6 70%, #783BCE 100%)" };
+
   const PAGES = [
+    // ---- Admincontrol Data Room (isNew → "New" label in the menu) ----
+    {
+      name: "Due Diligence Templates",
+      product: "Admincontrol Data Room",
+      isNew: true,
+      bg: "data-room-due-diligence-templates.png",
+      hero: HERO,
+      items: [
+        { src: "images/data-room-due-diligence-templates/hero.svg",
+          x: 760, y: 127, w: 800, h: 720 },
+        { src: "images/data-room-due-diligence-templates/five-templates-animated.svg",
+          x: 240, y: 2422, w: 570, h: 570 },
+        { src: "images/data-room-due-diligence-templates/zip-upload-animated.svg",
+          x: 836, y: 3144, w: 540, h: 540 },
+        { src: "images/data-room-due-diligence-templates/shape-the-tree-animated.svg",
+          x: 240, y: 3790, w: 570, h: 570 },
+        { src: "images/data-room-due-diligence-templates/numbered-index-animated.svg",
+          x: 870, y: 4554, w: 570, h: 570 },
+      ],
+    },
+    {
+      name: "Task Manager",
+      product: "Admincontrol Data Room",
+      isNew: true,
+      bg: "data-room-task-manager.png",
+      hero: HERO,
+      items: [
+        { src: "images/data-room-task-manager/hero.svg",
+          x: 760, y: 127, w: 800, h: 720 },
+        { src: "images/data-room-task-manager/assign-new-task-animated.svg",
+          x: 240, y: 2444, w: 570, h: 570 },
+        { src: "images/data-room-task-manager/task-manager-role-animated.svg",
+          x: 870, y: 3208, w: 570, h: 570 },
+        { src: "images/data-room-task-manager/track-tasks-animated.svg",
+          x: 240, y: 3972, w: 570, h: 570 },
+      ],
+    },
+    {
+      name: "Security & Access Control",
+      product: "Admincontrol Data Room",
+      isNew: true,
+      bg: "data-room-security-and-access-control.png",
+      hero: HERO,
+      items: [
+        { src: "images/data-room-security-and-access-control/hero.svg",
+          x: 760, y: 127, w: 800, h: 720 },
+        // Folder permissions + System roles reuse the animated Board Portal Access Control visuals for now
+        { src: "images/access-control/set-access-by-area-or-drill-into-a-single-subfolder-animated.svg",
+          x: 240, y: 2444, w: 570, h: 570 },
+        { src: "images/access-control/set-system-roles-and-user-roles-for-clear-document-access-animated.svg",
+          x: 870, y: 3208, w: 570, h: 570 },
+        { src: "images/data-room-security-and-access-control/separated-buyers-animated.svg",
+          x: 240, y: 3972, w: 570, h: 570 },
+      ],
+    },
+    {
+      name: "Q&A",
+      product: "Admincontrol Data Room",
+      isNew: true,
+      bg: "data-room-q-and-a.png",
+      hero: HERO,
+      items: [
+        { src: "images/data-room-q-and-a/hero.svg",
+          x: 760, y: 127, w: 800, h: 720 },
+        { src: "images/data-room-q-and-a/ask-or-import-animated.svg",
+          x: 240, y: 2444, w: 570, h: 570 },
+        { src: "images/data-room-q-and-a/route-questions-animated.svg",
+          x: 870, y: 3208, w: 570, h: 570 },
+        { src: "images/data-room-q-and-a/gatekeeper-animated.svg",
+          x: 240, y: 3972, w: 570, h: 570 },
+      ],
+    },
+    {
+      name: "Redaction",
+      product: "Admincontrol Data Room",
+      isNew: true,
+      bg: "data-room-redaction.png",
+      hero: HERO,
+      items: [
+        { src: "images/data-room-redaction/hero.svg",
+          x: 760, y: 127, w: 800, h: 720 },
+        { src: "images/data-room-redaction/search-and-redact-animated.svg",
+          x: 240, y: 2444, w: 570, h: 570 },
+        { src: "images/data-room-redaction/signed-documents-animated.svg",
+          x: 870, y: 3208, w: 570, h: 570 },
+        { src: "images/data-room-redaction/audit-history-animated.svg",
+          x: 240, y: 3972, w: 570, h: 570 },
+      ],
+    },
+    // ---- Admincontrol Board Portal ----
     {
       name: "AI Search",
+      product: "Admincontrol Board Portal",
       bg: "ai-search.png",
+      hero: { ...AI_HERO, text: "images/hero-text/ai-search.png" },
       items: [
+        { src: "images/ai-search/hero.svg",
+          x: 760, y: 127, w: 800, h: 720 },
         { src: "images/ai-search/ask-questions-in-natural-language-and-find-answers-animated.svg",
           x: 240, y: 2444, w: 570, h: 570 },
         { src: "images/ai-search/narrow-results-by-folder-date-range-or-a-custom-interval-animated.svg",
@@ -375,8 +504,12 @@
     },
     {
       name: "Access Control",
+      product: "Admincontrol Board Portal",
       bg: "access-control.png",
+      hero: { ...HERO, text: "images/hero-text/access-control.png" },
       items: [
+        { src: "images/access-control/hero.svg",
+          x: 760, y: 127, w: 800, h: 720 },
         { src: "images/access-control/set-system-roles-and-user-roles-for-clear-document-access-animated.svg",
           x: 240, y: 2422, w: 570, h: 570 },
         { src: "images/access-control/set-access-by-area-or-drill-into-a-single-subfolder-animated.svg",
@@ -387,8 +520,12 @@
     },
     {
       name: "Meetings & Agenda",
+      product: "Admincontrol Board Portal",
       bg: "meeting-and-agenda-management.png",
+      hero: { ...HERO, text: "images/hero-text/meeting-and-agenda-management.png" },
       items: [
+        { src: "images/meeting-and-agenda-management/hero.svg",
+          x: 760, y: 127, w: 800, h: 720 },
         { src: "images/meeting-and-agenda-management/last-meetings-agenda-is-the-fastest-first-draft-of-this-one-animated.svg",
           x: 240, y: 2452, w: 570, h: 570 },
         { src: "images/meeting-and-agenda-management/ai-assisted-drafting-for-the-wording-that-matters.svg",
@@ -401,8 +538,12 @@
     },
     {
       name: "Dashboard",
+      product: "Admincontrol Board Portal",
       bg: "dashboard.png",
+      hero: { ...HERO, text: "images/hero-text/dashboard.png" },
       items: [
+        { src: "images/dashboard/hero.svg",
+          x: 760, y: 127, w: 800, h: 720 },
         { src: "images/dashboard/the-secretariat-decides-what-the-board-reads-first.svg",
           x: 240, y: 2465, w: 570, h: 570 },
         { src: "images/dashboard/every-meeting-you-have-been-invited-to-in-one-list.svg",
@@ -413,8 +554,12 @@
     },
     {
       name: "E-signatures",
+      product: "Admincontrol Board Portal",
       bg: "e-signatures.png",
+      hero: { ...HERO, text: "images/hero-text/e-signatures.png" },
       items: [
+        { src: "images/e-signatures/hero.svg",
+          x: 760, y: 127, w: 800, h: 720 },
         { src: "images/e-signatures/choose-signature-levels-limited-or-advanced.svg",
           x: 240, y: 2447, w: 570, h: 564 },
         { src: "images/e-signatures/due-dates-and-reminders-that-keep-requests-moving.svg",
@@ -425,8 +570,12 @@
     },
     {
       name: "AI Agenda & Minutes",
+      product: "Admincontrol Board Portal",
       bg: "ai-agenda-and-minutes-drafting.png",
+      hero: { ...AI_HERO, text: "images/hero-text/ai-agenda-and-minutes-drafting.png" },
       items: [
+        { src: "images/ai-agenda-and-minutes-drafting/hero.svg",
+          x: 760, y: 127, w: 800, h: 720 },
         { src: "images/ai-agenda-and-minutes-drafting/sharpen-tone-and-clarity-without-rewriting-from-scratch.svg",
           x: 240, y: 2422, w: 570, h: 570 },
         { src: "images/ai-agenda-and-minutes-drafting/insert-ai-text-directly-or-ask-for-another-version.svg",
@@ -437,8 +586,12 @@
     },
     {
       name: "AI Executive Summaries",
+      product: "Admincontrol Board Portal",
       bg: "ai-agenda-and-minutes-drafting-1.png",
+      hero: { ...AI_HERO, text: "images/hero-text/ai-agenda-and-minutes-drafting-1.png" },
       items: [
+        { src: "images/ai-executive-summaries/hero.svg",
+          x: 760, y: 127, w: 800, h: 720 },
         { src: "images/ai-executive-summaries/key-information-organised-into-sections-not-a-wall-of-text.svg",
           x: 240, y: 2466, w: 570, h: 570 },
         { src: "images/ai-executive-summaries/insert-ai-text-directly-or-ask-for-another-version.svg",
@@ -449,8 +602,12 @@
     },
     {
       name: "Board Pack",
+      product: "Admincontrol Board Portal",
       bg: "board-pack.png",
+      hero: { ...HERO, text: "images/hero-text/board-pack.png" },
       items: [
+        { src: "images/board-pack/hero.svg",
+          x: 760, y: 127, w: 800, h: 720 },
         { src: "images/board-pack/build-the-pack-once-then-start-the-next-one-from-it.svg",
           x: 240, y: 2472, w: 570, h: 570 },
         { src: "images/board-pack/ai-powered-summaries-for-board-documents.svg",
@@ -463,8 +620,12 @@
     },
     {
       name: "Document Management",
+      product: "Admincontrol Board Portal",
       bg: "document-management.png",
+      hero: { ...HERO, text: "images/hero-text/document-management.png" },
       items: [
+        { src: "images/document-management/hero.svg",
+          x: 760, y: 127, w: 800, h: 720 },
         { src: "images/document-management/start-every-portal-from-a-proven-best-practice-template.svg",
           x: 240, y: 2475, w: 570, h: 564 },
         { src: "images/document-management/ai-powered-search-for-board-documents.svg",
@@ -487,7 +648,7 @@
   const loaderFill = document.getElementById("loaderFill");
 
   // ---- Preloader: load everything upfront ----
-  const totalAssets = PAGES.reduce((n, p) => n + 1 + p.items.length, 0);
+  const totalAssets = PAGES.reduce((n, p) => n + 1 + p.items.length + (p.hero?.text ? 1 : 0), 0);
   let loadedAssets = 0;
 
   function assetDone() {
@@ -506,6 +667,16 @@
     img.src = encodeURI(src);
   }
 
+  // "Q&A" → "q-and-a"
+  const slug = str => str.toLowerCase().replace(/&/g, " and ").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+  // Download as product-page-visual.svg so a client can tell files apart (every page has a hero.svg)
+  function downloadName(page, src) {
+    const file = src.split("/").pop();
+    const prefix = slug(page.product) + "-" + slug(page.name);
+    return file.startsWith(prefix) ? file : prefix + "-" + file;
+  }
+
   PAGES.forEach((page, i) => {
     // page container
     const el = document.createElement("div");
@@ -517,6 +688,26 @@
     bg.alt = page.name;
     trackImg(bg, page.bg);
     el.appendChild(bg);
+
+    if (page.hero) {
+      const hero = document.createElement("div");
+      hero.className = "hero-bg";
+      hero.style.top = page.hero.y + "px";
+      hero.style.height = page.hero.h + "px";
+      hero.style.background = page.hero.background;
+      if (!page.hero.text) hero.classList.add("multiply");
+      el.appendChild(hero);
+
+      if (page.hero.text) {
+        const text = document.createElement("img");
+        text.className = "hero-text";
+        text.alt = "";
+        text.style.top = page.hero.y + "px";
+        text.style.height = page.hero.h + "px";
+        trackImg(text, page.hero.text);
+        el.appendChild(text);
+      }
+    }
 
     page.items.forEach(item => {
       const wrap = document.createElement("div");
@@ -534,7 +725,7 @@
       const dl = document.createElement("a");
       dl.className = "dl";
       dl.href = encodeURI(item.src);
-      dl.download = item.src.split("/").pop();
+      dl.download = downloadName(page, item.src);
       dl.innerHTML =
         '<svg viewBox="0 0 12 12" fill="none" aria-hidden="true">' +
         '<path d="M6 1v7M3 5.5 6 8.5 9 5.5M1.5 11h9" stroke="currentColor" ' +
@@ -553,19 +744,24 @@
     btn.className = i === 0 ? "active" : "";
     btn.innerHTML = '<span class="dot"></span>';
     btn.appendChild(document.createTextNode(page.name));
+    if (page.isNew) btn.insertAdjacentHTML("beforeend", '<span class="new">New</span>');
     btn.addEventListener("click", () => {
       document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
       menu.querySelectorAll("button").forEach(b => b.classList.remove("active"));
       el.classList.add("active");
       btn.classList.add("active");
-      triggerLabel.textContent = page.name;
+      setTriggerLabel(page);
       closeMenu();
       window.scrollTo(0, 0);
     });
     menu.appendChild(btn);
   });
 
-  triggerLabel.textContent = PAGES[0].name;
+  function setTriggerLabel(page) {
+    triggerLabel.textContent = page.name;
+    if (page.isNew) triggerLabel.insertAdjacentHTML("beforeend", '<span class="new">New</span>');
+  }
+  setTriggerLabel(PAGES[0]);
 
   function openMenu() {
     switcher.classList.add("open");
